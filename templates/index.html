@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+   <head>
+      <title>Customer Segmentation App</title>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+      <link rel="shortcut icon" type="image/png" href="static/logo.png"/>
+      <script type="text/javascript" async src="{{ url_for('static', filename='script.js') }}"></script>
+   </head>
+   <body>
+      <div class="container">
+        <a href="https://fr.vestiairecollective.com/?gad=1&gclid=CjwKCAjwge2iBhBBEiwAfXDBR-KxRC6-SwszO-4QMg-IT7kh8ppLNN26K2kB45DdQOyMtcFeizJs4xoCqj4QAvD_BwE">
+          <img src="static/logo.png" alt="Logo" style="width:100%;">
+        </a>
+         <h1>Voucher Strategy Scoring App</h1>
+         <form action="{{ url_for('predict') }}" method="post" enctype="multipart/form-data">
+           <h2>Upload a CSV file to get started:</h2>
+           <div class="file-upload">
+             <label for="file" id="file-label">Choose a file...</label>
+             <input type="file" name="file" id="file" accept=".csv">
+           </div>
+            <br><br>
+            <button type="submit" class="btn">Predict</button>
+        </form>
+      </div>
+   </body>
+</html>
