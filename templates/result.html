@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+   <head>
+      <title>Result</title>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+      <link rel="shortcut icon" type="image/png" href="static/logo.png"/>
+   </head>
+   <body>
+     <div class="container">
+       <a href="https://fr.vestiairecollective.com/?gad=1&gclid=CjwKCAjwge2iBhBBEiwAfXDBR-KxRC6-SwszO-4QMg-IT7kh8ppLNN26K2kB45DdQOyMtcFeizJs4xoCqj4QAvD_BwE">
+         <img src="static/logo.png" alt="Logo" style="width:100%;">
+       </a>
+        <h1>Result</h1>
+        <form method="post" action="{{ url_for('filter_result') }}">
+           <label for="max_value">Mimnimum Composite Score:</label>
+           <input type="number" step="0.01" name="max_value" id="max_value" value="{{ max_value }}" required>
+           <button type="submit" class="btn">Filter</button>
+        </form>
+        <br>
+        <form action="{{ url_for('home') }}">
+          <button type="submit" class="btn">Go back to home</button>
+        </form>
+         <table>
+           <thead>
+               <tr>
+                  <th>S.No</th>
+                  <th>ID_BUYER</th>
+                  <th>Score</th>
+               </tr>
+            </thead>
+            <tbody>
+               {{ table_html|safe }}
+            </tbody>
+         </table>
+      </div>
+   </body>
+</html>
