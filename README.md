@@ -41,9 +41,11 @@ The pre-requisites in order to run this repo and try our product are the followi
 
 # Contributors:
 
-
-- Thomas Taylor, thomas.taylor@essec.edu, @githubpseudo
-- Elie Trigano, elie.trigano@essec.edu,  @githubpseudo
+- Shubham AGARWAL,  b00802820@essec.edu, @githubpseudo
+- Vanshika JAIN, b00798733@essec.edu, @githubpseudo
+- Thomas TAYLOR, thomas.taylor@essec.edu, @githubpseudo
+- Elie TRIGANO, b00792972@essec.edu,  @githubpseudo
+- Shiyun WANG, b00802405@essec.edu, @githubpseudo
 
 Feel free to contact us for more information.
 
