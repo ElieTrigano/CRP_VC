@@ -134,7 +134,7 @@ def classification_model_testing(df, X_train, X_test, y_train, y_test):
 from skopt import BayesSearchCV
 from skopt.space import Real, Integer
 
-def hyperparameter_tuning_lgbm(X_train, X_test, y_train, y_test):
+def hyperparameter_tuning_lgbm_class(X_train, X_test, y_train, y_test, colnames):
     '''
     Function that performs hyperparameter tuning on LightGBM model
 
@@ -260,6 +260,16 @@ def hyperparameter_tuning_lgbm(X_train, X_test, y_train, y_test):
     print('Classification report: \n', classification_report(y_test, y_pred))
 
     print('--------------------------------------')
+    
+    # plot confusion matrix
+
+    plt.figure(figsize=(10, 10))
+    sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, fmt='g')
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    plt.title('Confusion Matrix')
+    plt.show()
+    print('--------------------------------------')
 
     # Create a dataframe with the feature importance
 
@@ -297,8 +307,6 @@ def hyperparameter_tuning_lgbm(X_train, X_test, y_train, y_test):
 
     return bayes_cv_tuner.best_estimator_, df_classification_result, y_pred_proba
 
-
-
 ## Composite Score
 
 from sklearn.preprocessing import MinMaxScaler
@@ -331,7 +339,6 @@ def calculate_composite_score(repeater_pred_proba, X_test_repeater_scaled, df_mo
     composite_df['COMPOSITE_SCORE'] = scaler.fit_transform(composite_df[['COMPOSITE_SCORE']])
 
     return composite_df
-
 
 # Model 2
 
@@ -423,7 +430,7 @@ def regression_model_testing(df, X_train, X_test, y_train, y_test):
 from skopt import BayesSearchCV
 from skopt.space import Real, Integer
 
-def xgb_evaluation(df, X_train, X_test, y_train, y_test):
+def xgb_evaluation(df, X_train, X_test, y_train, y_test, colnames):
     '''
     df : dataframe qui contient les données à analyser
 
@@ -559,7 +566,7 @@ def xgb_evaluation(df, X_train, X_test, y_train, y_test):
 from skopt import BayesSearchCV
 from skopt.space import Real, Integer
 
-def hyperparameter_tuning_lgbm(X_train, X_test, y_train, y_test):
+def hyperparameter_tuning_lgbm_reg(X_train, X_test, y_train, y_test, colnames):
     '''
     Function that performs hyperparameter tuning on LightGBM model
 
@@ -586,7 +593,7 @@ def hyperparameter_tuning_lgbm(X_train, X_test, y_train, y_test):
 
     # Create the parameter grid
     param_space = {
-        'learning_rate': Real(0.01, 1, prior='log-uniform'),
+        'learning_rate': Real(0.01, 0.1, prior='log-uniform'),
         'n_estimators': Integer(100, 10000),
         'num_leaves': Integer(2, 100),
         'min_data_in_leaf': Integer(0, 300),
@@ -602,13 +609,15 @@ def hyperparameter_tuning_lgbm(X_train, X_test, y_train, y_test):
     # Create the model to use for hyperparameter tuning
     model = LGBMRegressor(boosting_type='gbdt', n_jobs=-1, random_state=42)
 
+    cv = KFold(n_splits=7, shuffle=True, random_state=42)
+
     start= time.time()
     # Setup RandomizedSearchCV
     bayes_cv_tuner = BayesSearchCV(
         model,
         param_space,
         n_iter=100,
-        cv=5,
+        cv=cv,
         n_jobs=-1,
         verbose=0,
         random_state=42,
@@ -638,7 +647,6 @@ def hyperparameter_tuning_lgbm(X_train, X_test, y_train, y_test):
     #keep the y_pred in a file for later use 
 
     np.save('preds/CLTV_pred_lgbm.npy', y_pred)
-
 
     # Evaluate the model
 
@@ -677,6 +685,7 @@ def hyperparameter_tuning_lgbm(X_train, X_test, y_train, y_test):
     # plot SHAP values
 
     explainer = shap.TreeExplainer(bayes_cv_tuner.best_estimator_)
+
     shap_values = explainer.shap_values(X_test)
 
     shap.summary_plot(shap_values, X_test, plot_type="bar", feature_names=colnames)
