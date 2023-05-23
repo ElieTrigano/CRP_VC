@@ -29,7 +29,7 @@ from sklearn.feature_selection import SelectKBest, f_regression, RFE
 import category_encoders as ce
 
 # for classification
-from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, precision_score, recall_score, f1_score,multilabel_confusion_matrix
+from sklearn.metrics import confusion_matrix, precision_recall_curve, classification_report, accuracy_score, precision_score, recall_score, f1_score,multilabel_confusion_matrix
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, HistGradientBoostingClassifier
@@ -158,7 +158,6 @@ def hyperparameter_tuning_lgbm_class(X_train, X_test, y_train, y_test, colnames)
         The best model after hyperparameter tuning
 
     '''
-
     # Create the parameter grid
     param_space = {
         'learning_rate': Real(0.01, 1, prior='log-uniform'),
@@ -291,6 +290,8 @@ def hyperparameter_tuning_lgbm_class(X_train, X_test, y_train, y_test, colnames)
 
     # plot SHAP values
 
+    print('SHAP values plot: ')
+
     explainer = shap.TreeExplainer(bayes_cv_tuner.best_estimator_)
 
     shap_values = explainer.shap_values(X_test)
@@ -298,6 +299,19 @@ def hyperparameter_tuning_lgbm_class(X_train, X_test, y_train, y_test, colnames)
     shap.summary_plot(shap_values, X_test, plot_type="bar", feature_names=colnames)
 
     print('--------------------------------------')
+
+        # plot precision-recall curve
+    precision, recall, thresholds = precision_recall_curve(y_test, y_pred_proba)
+    plt.figure(figsize=(10, 6))
+    plt.plot(recall, precision, color='b')
+    plt.fill_between(recall, precision, alpha=0.2, color='b')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title('Precision-Recall Curve')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.0])
+    plt.grid(True)
+    plt.show()
 
     # save the model as a pickle file in the models folder
 
@@ -328,15 +342,16 @@ def calculate_composite_score(repeater_pred_proba, X_test_repeater_scaled, df_mo
     composite_df['ID_BUYER'] = id_buyer_test
     composite_df['REPEATER_pred_proba'] = repeater_pred_proba
     composite_df['CLTV'] = test_cltv.values
+
+    # Normalise the CLTV values between 0 and 1
+    scaler = MinMaxScaler()
+    composite_df['CLTV'] = scaler.fit_transform(composite_df[['CLTV']])
+
     composite_df['COMPOSITE_SCORE'] = (weight_repeater * composite_df['REPEATER_pred_proba']) + (weight_cv * composite_df['CLTV'])
 
     # Sort the composite_df by COMPOSITE_SCORE in descending order
     composite_df = composite_df.sort_values(by='COMPOSITE_SCORE', ascending=False)
     composite_df.reset_index(drop=True, inplace=True)
-
-    # Scale the COMPOSITE_SCORE between 0 and 1
-    scaler = MinMaxScaler()
-    composite_df['COMPOSITE_SCORE'] = scaler.fit_transform(composite_df[['COMPOSITE_SCORE']])
 
     return composite_df
 
