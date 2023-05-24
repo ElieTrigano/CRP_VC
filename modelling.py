@@ -732,7 +732,7 @@ def WA_Scoring(X_test_REPEATER,repeater_pred_proba, cltv_pred_lgbm, weight_repea
 
     WA_df['cltv_pred_lgbm'] = scaler.fit_transform(WA_df[['cltv_pred_lgbm']])
 
-    composite_score = weight_repeater * repeater_pred_proba + weight_CLTV * cltv_pred_lgbm
+    composite_score = weight_repeater * WA_df['repeater_pred_proba'] + weight_CLTV * WA_df['cltv_pred_lgbm']
 
     WA_df['Composite_Score'] = composite_score
 
