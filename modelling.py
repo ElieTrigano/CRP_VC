@@ -172,7 +172,7 @@ def hyperparameter_tuning_lgbm_class(X_train, X_test, y_train, y_test, colnames)
         'reg_alpha': Real(0.0, 0.5),
         'reg_lambda': Real(0.0, 0.5)
     }
-        
+
     # Create the model to use for hyperparameter tuning
     model = LGBMClassifier(boosting_type='gbdt', objective='binary', n_jobs=-1, random_state=42, is_unbalance= True)
 
@@ -718,9 +718,6 @@ def hyperparameter_tuning_lgbm_reg(X_train, X_test, y_train, y_test, colnames):
 
 def WA_Scoring(X_test_REPEATER,repeater_pred_proba, cltv_pred_lgbm, weight_repeater=0.8, weight_CLTV = 0.2):
 
-
-    composite_score = weight_repeater * repeater_pred_proba + weight_CLTV * cltv_pred_lgbm
-
     WA_df = X_test_REPEATER.copy()
 
     # add repeater_pred_proba and cltv_pred_lgbm to WA_df
@@ -729,19 +726,19 @@ def WA_Scoring(X_test_REPEATER,repeater_pred_proba, cltv_pred_lgbm, weight_repea
 
     WA_df['cltv_pred_lgbm'] = cltv_pred_lgbm
 
+    # Normalize the CLTV values between 0 and 1 using MinMaxScaler
+
+    scaler = MinMaxScaler()
+
+    WA_df['cltv_pred_lgbm'] = scaler.fit_transform(WA_df[['cltv_pred_lgbm']])
+
+    composite_score = weight_repeater * repeater_pred_proba + weight_CLTV * cltv_pred_lgbm
+
     WA_df['Composite_Score'] = composite_score
-
-
-    # keep only the repeater_pred_proba,Composite_Score and cltv_pred_lgbm column 
 
     columns_to_keep = ['repeater_pred_proba', 'cltv_pred_lgbm', 'Composite_Score']
 
     WA_df = WA_df[columns_to_keep]
-
-    # normalise the composite score between 0 and 1 using MinMaxScaler
-    scaler = MinMaxScaler()
-
-    WA_df['Composite_Score'] = scaler.fit_transform(WA_df[['Composite_Score']])
 
     WA_df = WA_df.sort_values(by='Composite_Score', ascending=False)
 
