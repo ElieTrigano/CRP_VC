@@ -1,7 +1,6 @@
-# CRP_VC
-Corporate Research Project - DSBA x  Vestiaire Collective
+# Corporate Research Project - DSBA x  Vestiaire Collective
 
-# Objective 
+## Objective 
 
 **Enhancing customer retention through predictive analysis of repeat behavior.**
 
