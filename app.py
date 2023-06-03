@@ -7,13 +7,13 @@ import joblib
 from io import StringIO
 from sklearn.preprocessing import MinMaxScaler
 from data_processing import data_processing_mmao_transac, data_processing_likes, data_preprocessing_comment, merge_dataframes
-from further_preprocessing import drop_columns, date_time_converting, missing_values, target_encoding, encoding, pre_processing
+from model_preprocessing import drop_columns, date_time_converting, missing_values, target_encoding, encoding, pre_processing
 
 app = Flask(__name__)
 
 # Load the trained models
-model1 = joblib.load('models/REPEATER_LightGBM_tuned_wholedataset_v6.pkl')
-model2 = joblib.load('models/CLTV_xgb_model_Sample.pkl')
+model1 = joblib.load('models/REPEATER_LightGBM.pkl')
+model2 = joblib.load('models/CLTV_lgbm.pkl')
 model3 = joblib.load('models/target_encoder_repeater.pkl')
 model4 = joblib.load('models/target_encoder_CLTV.pkl')
 model5 = joblib.load('models/scaler_repeater.pkl')
@@ -27,29 +27,7 @@ def home():
 @app.route('/predict', methods=['POST'])
 def predict():
     # Load the input data
-    '''
-    files = request.files.getlist('file')  # Retrieve multiple files
-    dataframes = [None] * 4  # Initialize the list to store the DataFrames
-
-    # Read each file and store it in the corresponding index of the dataframes list
-    for file in files:
-        filename = file.filename
-        if filename == 'LIST_MMAO.csv':
-            dataframes[0] = pd.read_csv(file)
-        elif filename == 'LIST_TRANSACTION.csv':
-            dataframes[1] = pd.read_csv(file)
-        elif filename == 'LIST_LIKES.csv':
-            dataframes[2] = pd.read_csv(file)
-        elif filename == 'LIST_COMMENT.csv':
-            dataframes[3] = pd.read_csv(file)
-
-    df_transac = data_processing_mmao_transac(dataframes[0], dataframes[1])
-    df_likes = data_processing_likes(dataframes[2])
-    df_comments = data_preprocessing_comment(dataframes[3])
-
-    # Merge the DataFrames
-    data = merge_dataframes(df_transac, df_likes, df_comments)
-    '''
+   
     data = pd.read_csv(request.files.get('file'))
     input_data = drop_columns(data)
     input_data = date_time_converting(data)
@@ -65,13 +43,15 @@ def predict():
     X = input_data.drop(['REPEATER', 'CLTV'], axis=1)
     y_REPEATER = input_data['REPEATER']
     y_CLTV = input_data['CLTV']
-    # Apply target encoding
     X_REPEATER = X_CLTV = X.copy()
-
+    
+    # Apply target encoding
+   `## to Repeater data
     X_REPEATER_encoded = model3.transform(X_REPEATER[cols_to_encode])
     X_REPEATER = X_REPEATER.drop(cols_to_encode, axis=1)
     X_REPEATER = pd.concat([X_REPEATER, X_REPEATER_encoded], axis=1)
-
+    
+    ## to CLTV data
     X_CLTV_encoded = model4.transform(X_CLTV[cols_to_encode])
     X_CLTV = X_CLTV.drop(cols_to_encode, axis=1)
     X_CLTV = pd.concat([X_CLTV, X_CLTV_encoded], axis=1)
