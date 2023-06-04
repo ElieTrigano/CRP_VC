@@ -45,7 +45,7 @@ An overview of each files:
 - df_model.csv: final dataset used for the modelling purposes
 - EDA_model.ipynb: EDA on the final dataset df_model
 - model_preprocessing.py: functions used in the modelling part of the project, it contains our methodology for Feature Selection & Engineering, Scaling and others
-- modelling.py: functions used for Model Selection, Hyperparameter Tuning, Final model evaluation and implementation
+- modeling.py: functions used for Model Selection, Hyperparameter Tuning, Final model evaluation and implementation
 - model_products.ipynb: notebook of the modelling implementation phase with the two models and the demonstration of a Uplift Model
 - requirements.txt: file with packages used in our project
 
