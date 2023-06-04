@@ -35,9 +35,7 @@ We have features that are concentrated around several main areas of the platform
 
 ## Pre-requisites 
 
-You can download the libraries from the requirement.txt file in our repo. 
-The pre-requisites in order to run this repo and try our product are the following libraries :
-
+You can download the libraries from the requirement.txt file in our repository.
 ## Files 
 
 An overview of each files:
@@ -49,18 +47,14 @@ An overview of each files:
 - model_preprocessing.py: functions used in the modelling part of the project, it contains our methodology for Feature Selection & Engineering, Scaling and others
 - modelling.py: functions used for Model Selection, Hyperparameter Tuning, Final model evaluation and implementation
 - model_products.ipynb: notebook of the modelling implementation phase with the two models and the demonstration of a Uplift Model
+- requirements.txt: file with packages used in our project
 
 ## Contributors:
 
-- Shubham AGARWAL,  b00802820@essec.edu, @githubpseudo
-- Vanshika JAIN, b00798733@essec.edu, @githubpseudo
-- Thomas TAYLOR, thomas.taylor@essec.edu, @githubpseudo
-- Elie TRIGANO, b00792972@essec.edu,  @githubpseudo
-- Shiyun WANG, b00802405@essec.edu, @githubpseudo
+- Shubham AGARWAL,  b00802820@essec.edu
+- Vanshika JAIN, b00798733@essec.edu
+- Thomas TAYLOR, thomas.taylor@essec.edu
+- Elie TRIGANO, b00792972@essec.edu
+- Shiyun WANG, b00802405@essec.edu
 
 Feel free to contact us for more information.
-
-
-
-
-
