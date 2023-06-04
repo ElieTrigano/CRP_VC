@@ -38,6 +38,18 @@ We have features that are concentrated around several main areas of the platform
 You can download the libraries from the requirement.txt file in our repo. 
 The pre-requisites in order to run this repo and try our product are the following libraries :
 
+## Files 
+
+An overview of each files:
+- app.py: main python file for our Flask app
+- data_processing.ipynb : notebook used in order to merge the 3 raw datasets pulled from Vestiaire Collective's datalake
+- data_processing.py: functions used in data processing step used for the app
+- df_model.csv: final dataset used for the modelling purposes
+- EDA_model.ipynb: EDA on the final dataset df_model
+- model_preprocessing.py: functions used in the modelling part of the project, it contains our methodology for Feature Selection & Engineering, Scaling and others
+- modelling.py: functions used for Model Selection, Hyperparameter Tuning, Final model evaluation and implementation
+- model_products.ipynb: notebook of the modelling implementation phase with the two models and the demonstration of a Uplift Model
+
 ## Contributors:
 
 - Shubham AGARWAL,  b00802820@essec.edu, @githubpseudo
