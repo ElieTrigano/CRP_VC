@@ -46,7 +46,7 @@ def predict():
     X_REPEATER = X_CLTV = X.copy()
     
     # Apply target encoding
-   `## to Repeater data
+    # ## to Repeater data
     X_REPEATER_encoded = model3.transform(X_REPEATER[cols_to_encode])
     X_REPEATER = X_REPEATER.drop(cols_to_encode, axis=1)
     X_REPEATER = pd.concat([X_REPEATER, X_REPEATER_encoded], axis=1)
