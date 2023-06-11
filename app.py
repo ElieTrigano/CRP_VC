@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, send_file, make_response
+from flask import Flask, render_template, request, send_file, make_response, send_from_directory
 import pandas as pd
 import numpy as np
 import category_encoders as ce
 import xgboost as xgb
 import joblib
+import os
 from io import StringIO
 from sklearn.preprocessing import MinMaxScaler
 from model_preprocessing import drop_columns, date_time_converting, missing_values, encoding
@@ -90,11 +91,20 @@ def predict():
     # Convert WA_df to HTML table
     max_value = 0.5
     filtered_df = WA_df[WA_df['Composite_Score'] >= max_value]
-    table_html = filtered_df.to_html(header=False)
+    top_df = filtered_df.head(10)
+    table_html = top_df.to_html(header=False)
+
+    # Save the DataFrame to Excel
+    filtered_df.to_csv('final_report.csv', index=False)
 
     return render_template('result.html', table_html=table_html, max_value=max_value)
-    #return render_template('result.html', table_html=table_html)
-    #return response
+    #return render_template('result.html', table_html=table_html, max_value=max_value)
+
+@app.route('/download')
+def download ():
+    #For windows you need to use drive name [ex: F:/Example.pdf]
+    path = "final_report.csv"
+    return send_file(path, as_attachment=True)
 
 @app.route('/filter_result', methods=['POST'])
 def filter_result():
@@ -104,8 +114,11 @@ def filter_result():
     WA_df = pd.read_csv('WA_df.csv', index_col=0)
     # Filter the WA_df based on the maximum value
     filtered_df = WA_df[WA_df['Composite_Score'] >= max_value]
+    # Convert the filtered dataframe to HTML table and show only top 10 entries on webpage
+    top_df = filtered_df.head(10)
+    table_html = top_df.to_html(header=False)
 
-    # Convert the filtered dataframe to HTML table
-    table_html = filtered_df.to_html(header=False)
+    # Save the DataFrame to Excel
+    filtered_df.to_csv('final_report.csv', index=False)
 
     return render_template('result.html', table_html=table_html, max_value=max_value)

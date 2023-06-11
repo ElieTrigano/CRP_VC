@@ -23,6 +23,11 @@
         <form action="{{ url_for('home') }}">
           <button type="submit" class="btn">Go back to home</button>
         </form>
+        <p style="text-align: center; width:100%; font-family: fantasy;">Download complete report</p>
+        <form action="{{ url_for('download') }}" style="text-align:center;">
+            <button type="submit" class="btn" style="width:100%;"><img src="static/excel_download.png" alt="excel" style="height: 30px; width: auto;"></button>
+        </form>
+        <p style="text-align: center; width:100%; font-family: fantasy;">Top 10 entries</p>
          <table>
            <thead>
                <tr>
