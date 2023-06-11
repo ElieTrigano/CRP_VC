@@ -6,8 +6,7 @@ import xgboost as xgb
 import joblib
 from io import StringIO
 from sklearn.preprocessing import MinMaxScaler
-from data_processing import data_processing_mmao_transac, data_processing_likes, data_preprocessing_comment, merge_dataframes
-from model_preprocessing import drop_columns, date_time_converting, missing_values, target_encoding, encoding, pre_processing
+from model_preprocessing import drop_columns, date_time_converting, missing_values, encoding
 
 app = Flask(__name__)
 
@@ -27,8 +26,9 @@ def home():
 @app.route('/predict', methods=['POST'])
 def predict():
     # Load the input data
-   
     data = pd.read_csv(request.files.get('file'))
+
+    # data pre-processing
     input_data = drop_columns(data)
     input_data = date_time_converting(data)
     input_data = missing_values(data)
@@ -37,20 +37,19 @@ def predict():
     # set ID_BUYER as index
     input_data.set_index('ID_BUYER', inplace=True)
 
-    cols_to_encode = ['ID_CATEGORY', 'ID_SUBCATEGORY', 'ID_BRAND', 'ID_PAYMENT_TYPE']
+
 
     # Remove the target columns
     X = input_data.drop(['REPEATER', 'CLTV'], axis=1)
-    y_REPEATER = input_data['REPEATER']
-    y_CLTV = input_data['CLTV']
     X_REPEATER = X_CLTV = X.copy()
-    
+
     # Apply target encoding
-    # ## to Repeater data
+    ## to Repeater data
+    cols_to_encode = ['ID_CATEGORY', 'ID_SUBCATEGORY', 'ID_BRAND', 'ID_PAYMENT_TYPE']
     X_REPEATER_encoded = model3.transform(X_REPEATER[cols_to_encode])
     X_REPEATER = X_REPEATER.drop(cols_to_encode, axis=1)
     X_REPEATER = pd.concat([X_REPEATER, X_REPEATER_encoded], axis=1)
-    
+
     ## to CLTV data
     X_CLTV_encoded = model4.transform(X_CLTV[cols_to_encode])
     X_CLTV = X_CLTV.drop(cols_to_encode, axis=1)
@@ -62,37 +61,31 @@ def predict():
 
     # Make predictions using the trained models
     y_pred_proba = model1.predict_proba(X_REPEATER_scaled)[:,1]
+    y_pred = model2.predict(X_CLTV_scaled)
 
-    xgtest = xgb.DMatrix(X_CLTV_scaled, label=y_CLTV)
-    y_pred = model2.predict(xgtest)
+    WA_df = X_REPEATER.copy()
+    # Normalize the CLTV values between 0 and 1 using MinMaxScaler
+    WA_df['repeater_pred_proba'] = y_pred_proba
+    WA_df['cltv_pred_lgbm'] = y_pred
+
+    # Normalize the CLTV values between 0 and 1 using MinMaxScaler
+    scaler = MinMaxScaler()
+    WA_df['cltv_pred_lgbm'] = scaler.fit_transform(WA_df[['cltv_pred_lgbm']])
 
     # Use the predicted Repeater rate & the predicted CLTV
     weight_repeater = 0.8
     weight_CLTV = 0.2
+    composite_score = weight_repeater * WA_df['repeater_pred_proba'] + weight_CLTV * WA_df['cltv_pred_lgbm']
 
-    composite_score = weight_repeater * y_pred_proba + weight_CLTV * y_pred
-
-    WA_df = X_REPEATER.copy()
     WA_df['Composite_Score'] = composite_score
-
-    # normalise the composite score between 0 and 1 using MinMaxScaler
-    scaler = MinMaxScaler()
-
-    WA_df['Composite_Score'] = scaler.fit_transform(WA_df[['Composite_Score']])
 
     # rank the customers by their composite score
     WA_df = WA_df.sort_values(by='Composite_Score', ascending=False)
     WA_df = WA_df.reset_index()
     WA_df = WA_df[['ID_BUYER','Composite_Score']]
-    # Convert WA_df to CSV format
-    #csv_output = StringIO()
+
+    #save csv file
     WA_df.to_csv('WA_df.csv')
-
-    # Download the CSV file
-    #response = make_response(csv_output.getvalue())
-    #response.headers['Content-Disposition'] = 'attachment; filename=WA_df.csv'
-    #response.headers['Content-Type'] = 'text/csv'
-
 
     # Convert WA_df to HTML table
     max_value = 0.5
