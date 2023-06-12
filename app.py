@@ -122,3 +122,7 @@ def filter_result():
     filtered_df.to_csv('final_report.csv', index=False)
 
     return render_template('result.html', table_html=table_html, max_value=max_value)
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
